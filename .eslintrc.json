@@ -1,0 +1,22 @@
+{
+  "root": true,
+  "extends": ["standard", "plugin:node/recommended"],
+  "rules": {
+    "curly": ["error", "all"],
+    "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
+    "guard-for-in": "error",
+    "no-console": "error",
+    "no-debugger": "error",
+    "radix": "error",
+    "node/no-deprecated-api": "warn",
+    "node/no-process-exit": "off",
+    "no-process-exit": "off",
+    "node/shebang": "off",
+    "no-empty-function": "error",
+    "no-shadow": "warn"
+  },
+  "env": {
+    "commonjs": true,
+    "es6": true
+  }
+}

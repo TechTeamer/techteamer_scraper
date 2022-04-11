@@ -1,0 +1,23 @@
+{
+  "name": "nyilvantarto_scrapi",
+  "version": "1.0.0",
+  "main": "scrape.js",
+  "license": "proprietary",
+  "private": true,
+  "devDependencies": {
+    "eslint": "^8.9.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0"
+  },
+  "dependencies": {
+    "@techteamer/ocsp": "^1.0.0",
+    "cookie": "^0.4.2",
+    "getconfig": "^4.5.0",
+    "http-proxy": "^1.18.1",
+    "inquirer": "^8.2.0",
+    "puppeteer": "^13.3.2",
+    "type-is": "^1.6.18"
+  }
+}

@@ -1,0 +1,18 @@
+.idea/*
+.vscode/*
+node_modules/*
+/npm-debug.log*
+/yarn-error.log
+
+/logs/*
+!/logs/.gitkeep
+captures/*
+!captures/.gitkeep
+
+# for custom build
+yarn-offline-cache
+*.tar
+*.gz
+*.7z
+*.rar
+*.zip
