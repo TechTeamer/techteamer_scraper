@@ -24,6 +24,7 @@ class Scraper {
   constructor (scraperOptions) {
     this.options = scraperOptions
     this.proxyPort = this.options.port || 8080
+    this.proxyHost = `http://localhost:${this.proxyPort}`
     this.logger = this.options.logger || global.console
     this.proxyStartDate = null
     this.proxy = null
@@ -44,7 +45,7 @@ class Scraper {
     })
 
     this.proxy = this.createProxy()
-    this.puppet = new Puppet(this.options.browser)
+    this.puppet = new Puppet(this.proxyHost, this.options.browser)
 
     let results
     try {

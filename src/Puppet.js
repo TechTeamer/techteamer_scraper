@@ -2,12 +2,14 @@ const puppeteer = require('puppeteer')
 
 class Puppet {
   /**
+   * @param {String} host Local proxy host
    * @param {Object} puppetOptions
    * @param {Boolean} puppetOptions.autoClose auto close browser window after the scraper function finishes
    * @param {Object} puppetOptions.puppeteer Puppeteer options
    */
-  constructor (puppetOptions) {
+  constructor (host, puppetOptions) {
     this.options = puppetOptions
+    this.host = host
     this.logger = this.options.logger || global.console
     this.browser = null
   }
@@ -127,16 +129,17 @@ class Puppet {
     })
 
     if (url) {
-      console.debug('PUPPETEER opening url', url)
-      await page.goto(url)
+      const uri = `${this.host}${url}`
+      console.debug('PUPPETEER opening url', uri)
+      await page.goto(uri)
 
       try {
         await page.waitForNetworkIdle({
           timeout: 3000
         })
-        console.debug('PUPPETEER navigated to', url)
+        console.debug('PUPPETEER navigated to', uri)
       } catch (err) {
-        console.error('Error opening page', url, err)
+        console.error('Error opening page', uri, err)
         throw new Error('Error opening page')
       }
     }

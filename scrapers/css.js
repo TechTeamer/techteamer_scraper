@@ -16,7 +16,7 @@ class CssScraper extends Scraper {
   }
 
   async scraper (puppet, browser) {
-    const page = await puppet.setupPage(browser, 'http://localhost:8080/')
+    const page = await puppet.setupPage(browser, '/')
 
     console.log('Page opened')
 
