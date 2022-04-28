@@ -36,11 +36,9 @@ class Puppet {
         // handle force close events form the outside during a connection attempt
         // NOTE: sometimes it's okay to receive an error here if the browser was abruptly closed
         // e.g. if TLS was rejected it causes "Protocol error (Page.navigate): Target closed."
-        this.logger.warn('Browser already closed:', err.message)
         return
       }
 
-      this.logger.error('Error doing scraping stuff', err)
       throw new Error('Error doing scraping stuff')
     }
 
@@ -75,7 +73,6 @@ class Puppet {
     const status = response.status()
     const statusText = response.statusText()
     const remoteAddress = response.remoteAddress()
-    // console.debug('PUPPETEER response:response', remoteAddress.ip, remoteAddress.port, method, url, status, statusText, JSON.stringify(headers, null, 0))
 
     const securityDetails = response.securityDetails()
     if (securityDetails) {
@@ -99,12 +96,10 @@ class Puppet {
   }
 
   async setupPage (browser, url) {
-    // console.debug('PUPPETEER page:new', url)
     const page = await browser.newPage()
     // await page.setRequestInterception(true)
 
     page.on('request', async (request) => {
-      console.debug('PUPPETEER REQUEST', request.url())
 
       // if (request.isInterceptResolutionHandled()) {
       //   return
@@ -114,7 +109,6 @@ class Puppet {
     })
 
     page.on('response', async (response) => {
-      console.debug('PUPPETEER RESPONSE', response.url())
       const request = response.request()
 
       if (request.resourceType() !== 'document') {
@@ -130,16 +124,13 @@ class Puppet {
 
     if (url) {
       const uri = `${this.host}${url}`
-      console.debug('PUPPETEER opening url', uri)
       await page.goto(uri)
 
       try {
         await page.waitForNetworkIdle({
           timeout: 3000
         })
-        console.debug('PUPPETEER navigated to', uri)
       } catch (err) {
-        console.error('Error opening page', uri, err)
         throw new Error('Error opening page')
       }
     }
@@ -177,7 +168,6 @@ class Puppet {
     }
 
     const button = await formElement.$(submit)
-    console.debug('PUPPETEER submit', submit, JSON.stringify(fields, null, 0))
 
     const [submitResponse] = await Promise.all([
       page.waitForNavigation({
