@@ -130,9 +130,11 @@ class Scraper {
   createProxy () {
     if (this.options.ocsp && this.options.ocsp.agent) {
       if(this.options.ocsp.agent instanceof ocsp.Agent) {
+        console.log('inst Agent');
         this.ocspAgent = this.options.ocsp.agent
       } else {
-        this.ocspAgent = new ocsp.Agent(this.options.ocsp.agent)
+        this.ocspAgent = new ocsp.Agent()
+        console.log('define');
       }
     }
 
@@ -142,13 +144,12 @@ class Scraper {
       selfHandleResponse: false,
       xfwd: false,
       ...this.options.proxy,
-      agent: this.ocspAgent
+      agent: new ocsp.Agent()
     })
 
     this.proxyStartDate = new Date()
 
     proxy.on('error', (err, req, res) => {
-      this.logger.error('Error during proxy connection', err)
       this._exit(new Error('Error during proxy connection', err.code, err.message))
     })
 
@@ -160,7 +161,7 @@ class Scraper {
       const rawHeaders = logHeaders
       ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
       : ''
-      
+
       proxyReq.setHeader('referer', requestUrl.origin)
 
       if (this.options.ocsp && this.options.ocsp.agent) {

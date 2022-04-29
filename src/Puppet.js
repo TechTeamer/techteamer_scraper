@@ -66,14 +66,6 @@ class Puppet {
   }
 
   async logResponse (response) {
-    const request = response.request()
-    const method = request.method()
-    const headers = response.headers()
-    const url = response.url()
-    const status = response.status()
-    const statusText = response.statusText()
-    const remoteAddress = response.remoteAddress()
-
     const securityDetails = response.securityDetails()
     if (securityDetails) {
       const issuer = securityDetails.issuer()
@@ -88,16 +80,10 @@ class Puppet {
       console.debug('PUPPETEER response:protocol', protocol)
       console.debug('PUPPETEER response:altNames', subjectAlternativeNames)
     }
-
-    // if (status >= 200 && status < 300) {
-    //   const html = await response.text()
-    //   console.debug('PUPPETEER response:body', html.slice(0, 100))
-    // }
   }
 
   async setupPage (browser, url) {
     const page = await browser.newPage()
-    // await page.setRequestInterception(true)
 
     page.on('request', async (request) => {
 
@@ -119,7 +105,6 @@ class Puppet {
     })
 
     page.on('requestfinished', async (request) => {
-      // console.debug('PUPPETEER requestfinished', request.method(), request.url())
     })
 
     if (url) {
@@ -146,7 +131,6 @@ class Puppet {
 
     const formElement = await page.$(form)
 
-    // console.debug('PUPPETEER form', form)
     for (const [name, value] of Object.entries(fields)) {
       await formElement.waitForSelector(name)
 
@@ -159,7 +143,6 @@ class Puppet {
 
       if (Array.isArray(realValue)) {
         await input.select(...realValue)
-        // console.debug('PUPPETEER select', name, ...realValue)
       } else {
         await input.click()
         await input.type(realValue, { delay: 100 })

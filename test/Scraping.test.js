@@ -14,7 +14,7 @@ const config = {
     "proxy": {
         "target": {
             "protocol": "https:",
-            "host": "www.httpbin.org",
+            "host": "revoked.badssl.com",
             "port": 443
         },
         "minVersion": "TLSv1.2"
@@ -81,7 +81,6 @@ describe('Scraping the form', () => {
 
             return response
         }
-
 
         const result = await testScraper.scrape()
 
