@@ -11,6 +11,7 @@
     "node/no-deprecated-api": "warn",
     "node/no-process-exit": "off",
     "no-process-exit": "off",
+    "node/no-unpublished-require": "off",
     "node/shebang": "off",
     "no-empty-function": "error",
     "no-shadow": "warn"

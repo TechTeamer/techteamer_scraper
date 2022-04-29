@@ -129,12 +129,10 @@ class Scraper {
 
   createProxy () {
     if (this.options.ocsp && this.options.ocsp.agent) {
-      if(this.options.ocsp.agent instanceof ocsp.Agent) {
-        console.log('inst Agent');
+      if (this.options.ocsp.agent instanceof ocsp.Agent) {
         this.ocspAgent = this.options.ocsp.agent
       } else {
         this.ocspAgent = new ocsp.Agent()
-        console.log('define');
       }
     }
 
@@ -155,12 +153,12 @@ class Scraper {
 
     proxy.on('proxyReq', async (proxyReq, req, res, options) => {
       const requestUrl = new URL(`${proxyReq.protocol}${proxyReq.host}${proxyReq.path}`)
-      const method = proxyReq.method
-      const href = requestUrl.href
-      const logHeaders = this.options.loggerOptions.verbosity.logHeaders
-      const rawHeaders = logHeaders
-      ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
-      : ''
+      // const method = proxyReq.method
+      // const href = requestUrl.href
+      // const logHeaders = this.options.loggerOptions.verbosity.logHeaders
+      // const rawHeaders = logHeaders
+      //   ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
+      //   : ''
 
       proxyReq.setHeader('referer', requestUrl.origin)
 
@@ -196,37 +194,35 @@ class Scraper {
         ocspCheck
       } = req[REQ_SESS_SYMBOL]
       const tlsSocket = proxyRes.socket.ssl || proxyRes.socket
-      const protocolVersion = tlsSocket.getProtocol()
-      const method = req.method
-      const href = requestUrl.href
-      const statusCode = proxyRes.statusCode
-      const statusMessage = proxyRes.statusMessage
-      const ip = proxyRes.socket.remoteAddress
-      const logHeaders = this.options.loggerOptions.verbosity.logHeaders
-      const rawHeaders = logHeaders
-        ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
-        : ''
+      // const protocolVersion = tlsSocket.getProtocol()
+      // const method = req.method
+      // const href = requestUrl.href
+      // const statusCode = proxyRes.statusCode
+      // const statusMessage = proxyRes.statusMessage
+      // const ip = proxyRes.socket.remoteAddress
+      // const logHeaders = this.options.loggerOptions.verbosity.logHeaders
+      // const rawHeaders = logHeaders
+      //   ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
+      //   : ''
 
       if (this._canSave()) {
-
         const chunks = []
         proxyRes.on('data', (chunk) => {
           chunks.push(chunk)
         })
         proxyRes.on('end', async () => {
           const body = Buffer.concat(chunks).toString()
-          await this.store(body, 'request', { requestUrl, method: req.method, file: 'res.txt'})
+          await this.store(body, 'request', { requestUrl, method: req.method, file: 'res.txt' })
         })
 
         if (ocspCheck) {
           const cert = tlsSocket.getPeerCertificate(true)
           // log cert based on verbosity
           if (cert) {
-            await this.store(cert.raw, 'cert', { requestUrl, method: req.method, file: 'res.cert.txt'})
-            
+            await this.store(cert.raw, 'cert', { requestUrl, method: req.method, file: 'res.cert.txt' })
             const issuer = cert.issuerCertificate
             if (issuer) {
-              await this.store(issuer.raw, 'issuer', { requestUrl, method: req.method, file: 'res.cert.txt'})
+              await this.store(issuer.raw, 'issuer', { requestUrl, method: req.method, file: 'res.cert.txt' })
             }
           }
         }
@@ -267,14 +263,14 @@ class Scraper {
   _doFilter () {
     return !!this.ipFilter
   }
-    
+
   async _targetAddressIPFilter (ipFilter, targetHost) {
     try {
       const hostIp = await dns.lookup(targetHost)
-      if(!proxyaddr.compile(ipFilter)(hostIp.address)) {
+      if (!proxyaddr.compile(ipFilter)(hostIp.address)) {
         throw new Error('Untrusted target IP: ' + hostIp.address)
-      }      
-    }  catch (error) {
+      }
+    } catch (error) {
       throw new Error('Invalid configuration: ipFilter: ' + error.message)
     }
   }
@@ -283,17 +279,15 @@ class Scraper {
   * Request/Response/Cert storing
   *
   * @param {String} data (Cert,Req/Res)
-  * @param {String} dataType type of the data (request, response, cert)
+  * @param {String} dataType type of the data
   * @param {URL} requestUrl request from original client
   * @param {String} method request method
-  * @param {String} file file name ending
   */
-  async store(data, dataType, { requestUrl, method, file }) {
-    const savePath = this._createSavePath(requestUrl, method, file) // file nem kell
+  async store (data, dataType, requestUrl, method) {
+    const savePath = this._createSavePath(requestUrl, method, dataType)
     fs.mkdirSync(path.dirname(savePath), { recursive: true })
     fs.writeFileSync(savePath, data)
   }
- 
 }
 
 module.exports = Scraper

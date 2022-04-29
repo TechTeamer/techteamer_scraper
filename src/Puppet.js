@@ -66,33 +66,24 @@ class Puppet {
   }
 
   async logResponse (response) {
-    const securityDetails = response.securityDetails()
-    if (securityDetails) {
-      const issuer = securityDetails.issuer()
-      const subjectName = securityDetails.subjectName()
-      const validFrom = securityDetails.validFrom()
-      const validTo = securityDetails.validTo()
-      const protocol = securityDetails.protocol()
-      const subjectAlternativeNames = securityDetails.subjectAlternativeNames()
-      console.debug('PUPPETEER response:issuer', issuer)
-      console.debug('PUPPETEER response:subjectName', subjectName)
-      console.debug('PUPPETEER response:valid', validFrom, validTo)
-      console.debug('PUPPETEER response:protocol', protocol)
-      console.debug('PUPPETEER response:altNames', subjectAlternativeNames)
-    }
+    // const securityDetails = response.securityDetails()
+    // if (securityDetails) {
+    //   const issuer = securityDetails.issuer()
+    //   const subjectName = securityDetails.subjectName()
+    //   const validFrom = securityDetails.validFrom()
+    //   const validTo = securityDetails.validTo()
+    //   const protocol = securityDetails.protocol()
+    //   const subjectAlternativeNames = securityDetails.subjectAlternativeNames()
+    //   console.debug('PUPPETEER response:issuer', issuer)
+    //   console.debug('PUPPETEER response:subjectName', subjectName)
+    //   console.debug('PUPPETEER response:valid', validFrom, validTo)
+    //   console.debug('PUPPETEER response:protocol', protocol)
+    //   console.debug('PUPPETEER response:altNames', subjectAlternativeNames)
+    // }
   }
 
   async setupPage (browser, url) {
     const page = await browser.newPage()
-
-    page.on('request', async (request) => {
-
-      // if (request.isInterceptResolutionHandled()) {
-      //   return
-      // }
-
-      // return request.continue()
-    })
 
     page.on('response', async (response) => {
       const request = response.request()
@@ -102,9 +93,6 @@ class Puppet {
       }
 
       await this.logResponse(response)
-    })
-
-    page.on('requestfinished', async (request) => {
     })
 
     if (url) {
@@ -146,7 +134,6 @@ class Puppet {
       } else {
         await input.click()
         await input.type(realValue, { delay: 100 })
-        // console.debug('PUPPETEER input', name, realValue)
       }
     }
 
