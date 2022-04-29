@@ -36,7 +36,7 @@
       "browser": "${self.defaults.browser}",
       "save": "${self.defaults.save}"
     },
-    "oscpTest": {
+    "ocspTest": {
       "port": "${self.defaults.port}",
       "loggerOptions": "${self.defaults.loggerOptions}",
       "proxy":  {

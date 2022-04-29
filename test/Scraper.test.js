@@ -7,7 +7,7 @@ const config = require('../config')
 
 describe('Proxy Test', () => {
   it('GET through proxy. Got revoked OCSP error', (done) => {
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.oscpTest'), {}))
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), {}))
 
     const testProxy = testScraper.createProxy()
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
