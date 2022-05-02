@@ -4,9 +4,12 @@ const sinon = require('sinon')
 const Scraper = require('../src/Scraper')
 const config = require('../config')
 
+const randomPort = () => Math.floor(Math.random() * (9000 - 8000 + 1) + 8000)
+
 describe('Scraping the form', () => {
   it('able to POST the form data and get proper response', async () => {
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), {}))
+    const testPort = randomPort()
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
 
     // ocsp check enabled
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
@@ -19,7 +22,7 @@ describe('Scraping the form', () => {
       const page = await puppet.setupPage(browser, '/forms/post')
 
       page.on('response', async (res) => {
-        if (res.url() === 'http://localhost:8080/post') {
+        if (res.url() === `http://localhost:${testPort}/post`) {
           response = await res.json()
         }
       })
@@ -49,7 +52,6 @@ describe('Scraping the form', () => {
 
       return response
     }
-
     const result = await testScraper.scrape()
 
     sinon.assert.called(testScraper.store)

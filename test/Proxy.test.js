@@ -5,13 +5,7 @@ const http = require('http')
 const { expect } = require('chai')
 const config = require('../config')
 
-let port = 8000
-const gen = {}
-Object.defineProperty(gen, 'port', {
-  get: function get () {
-    return port++
-  }
-})
+const randomPort = () => Math.floor(Math.random() * (9000 - 8000 + 1) + 8000)
 
 describe('Proxy Test', () => {
   afterEach(() => {
@@ -19,7 +13,7 @@ describe('Proxy Test', () => {
   })
 
   it('GET through proxy. Get revoked OCSP error', (done) => {
-    const testPort = gen.port
+    const testPort = randomPort()
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
@@ -45,7 +39,7 @@ describe('Proxy Test', () => {
   })
 
   it('GET through proxy. successfully get data', (done) => {
-    const testPort = gen.port
+    const testPort = randomPort()
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
@@ -78,7 +72,7 @@ describe('Proxy Test', () => {
   })
 
   it('POST through proxy. successfully post data', (done) => {
-    const testPort = gen.port
+    const testPort = randomPort()
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
