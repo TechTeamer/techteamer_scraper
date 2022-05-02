@@ -156,7 +156,7 @@ class Scraper {
       if (err.code && tlsErrorCodes.includes(err.code)) {
         this._exit(new CertError(err.message, err.code))
       } else {
-        this._exit(new Error('Error during proxy connection', err.code, err.message))
+        this._exit(new Error(`Error during proxy connection: ${err.message}`))
       }
     })
 
