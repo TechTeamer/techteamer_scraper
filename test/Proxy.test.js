@@ -5,13 +5,22 @@ const http = require('http')
 const { expect } = require('chai')
 const config = require('../config')
 
+let port = 8000
+const gen = {}
+Object.defineProperty(gen, 'port', {
+  get: function get () {
+    return port++
+  }
+})
+
 describe('Proxy Test', () => {
   afterEach(() => {
     sinon.restore()
   })
 
   it('GET through proxy. Get revoked OCSP error', (done) => {
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), {}))
+    const testPort = gen.port
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
@@ -29,14 +38,15 @@ describe('Proxy Test', () => {
 
     http.request({
       host: 'localhost',
-      port: 8080,
+      port: testPort,
       path: '/',
       method: 'GET'
     }).end()
   })
 
   it('GET through proxy. successfully get data', (done) => {
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), {}))
+    const testPort = gen.port
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
@@ -45,7 +55,7 @@ describe('Proxy Test', () => {
 
     http.request({
       host: 'localhost',
-      port: 8080,
+      port: testPort,
       path: '/get',
       method: 'GET'
     },
@@ -68,7 +78,8 @@ describe('Proxy Test', () => {
   })
 
   it('POST through proxy. successfully post data', (done) => {
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), {}))
+    const testPort = gen.port
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
@@ -77,7 +88,7 @@ describe('Proxy Test', () => {
 
     const req = http.request({
       host: 'localhost',
-      port: 8080,
+      port: testPort,
       path: '/post',
       method: 'POST'
     },
