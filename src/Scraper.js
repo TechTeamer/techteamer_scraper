@@ -5,9 +5,20 @@ const Puppet = require('./Puppet')
 const ocsp = require('@techteamer/ocsp')
 const proxyaddr = require('proxy-addr')
 const dns = require('dns').promises
+const tlsErrorCodes = require('./utils/CertErrors')
 
 // Symbol to.promises store scraper specific data on request objects
 const REQ_SESS_SYMBOL = Symbol('REQ_SESS')
+class CertError extends Error {
+  constructor (errorReason, errorCode) {
+    super(`Certificate error, reason: ${errorReason}. Error Code: ${errorCode}.`)
+    this.name = this.constructor.name
+    if (errorCode) {
+      this.errorCode = errorCode
+    }
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
 
 class Scraper {
   /**
@@ -128,13 +139,7 @@ class Scraper {
   }
 
   createProxy () {
-    if (this.options.ocsp && this.options.ocsp.agent) {
-      if (this.options.ocsp.agent instanceof ocsp.Agent) {
-        this.ocspAgent = this.options.ocsp.agent
-      } else {
-        this.ocspAgent = new ocsp.Agent()
-      }
-    }
+    this._createOCSPAgent()
 
     const proxy = httpProxy.createProxy({
       secure: true,
@@ -148,10 +153,14 @@ class Scraper {
     this.proxyStartDate = new Date()
 
     proxy.on('error', (err, req, res) => {
-      this._exit(new Error('Error during proxy connection', err.code, err.message))
+      if (err.code && tlsErrorCodes.includes(err.code)) {
+        this._exit(new CertError(err.message, err.code))
+      } else {
+        this._exit(new Error('Error during proxy connection', err.code, err.message))
+      }
     })
 
-    proxy.on('proxyReq', async (proxyReq, req, res, options) => {
+    proxy.on('proxyReq', (proxyReq, req, res, options) => {
       const requestUrl = new URL(`${proxyReq.protocol}${proxyReq.host}${proxyReq.path}`)
       // const method = proxyReq.method
       // const href = requestUrl.href
@@ -181,9 +190,9 @@ class Scraper {
         req.on('data', (chunk) => {
           chunks.push(chunk)
         })
-        req.on('end', async () => {
+        req.on('end', () => {
           const body = Buffer.concat(chunks).toString()
-          await this.store(body, 'request', { requestUrl, method: req.method, file: 'req.txt' })
+          this.store(body, 'request', { requestUrl, method: req.method, file: 'req.txt' })
         })
       }
     })
@@ -210,19 +219,19 @@ class Scraper {
         proxyRes.on('data', (chunk) => {
           chunks.push(chunk)
         })
-        proxyRes.on('end', async () => {
+        proxyRes.on('end', () => {
           const body = Buffer.concat(chunks).toString()
-          await this.store(body, 'request', { requestUrl, method: req.method, file: 'res.txt' })
+          this.store(body, 'request', { requestUrl, method: req.method, file: 'res.txt' })
         })
 
         if (ocspCheck) {
           const cert = tlsSocket.getPeerCertificate(true)
           // log cert based on verbosity
           if (cert) {
-            await this.store(cert.raw, 'cert', { requestUrl, method: req.method, file: 'res.cert.txt' })
+            this.store(cert.raw, 'cert', { requestUrl, method: req.method, file: 'res.cert.txt' })
             const issuer = cert.issuerCertificate
             if (issuer) {
-              await this.store(issuer.raw, 'issuer', { requestUrl, method: req.method, file: 'res.cert.txt' })
+              this.store(issuer.raw, 'issuer', { requestUrl, method: req.method, file: 'res.cert.txt' })
             }
           }
         }
@@ -275,6 +284,16 @@ class Scraper {
     }
   }
 
+  _createOCSPAgent () {
+    if (this.options.ocsp && this.options.ocsp.agent) {
+      if (this.options.ocsp.agent instanceof ocsp.Agent) {
+        this.ocspAgent = this.options.ocsp.agent
+      } else {
+        this.ocspAgent = new ocsp.Agent()
+      }
+    }
+  }
+
   /**
   * Request/Response/Cert storing
   *
@@ -283,7 +302,7 @@ class Scraper {
   * @param {URL} requestUrl request from original client
   * @param {String} method request method
   */
-  async store (data, dataType, requestUrl, method) {
+  store (data, dataType, requestUrl, method) {
     const savePath = this._createSavePath(requestUrl, method, dataType)
     fs.mkdirSync(path.dirname(savePath), { recursive: true })
     fs.writeFileSync(savePath, data)

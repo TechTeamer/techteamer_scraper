@@ -59,5 +59,5 @@ describe('Scraping the form', () => {
     expect(result.form.custname).to.be.a('string').equal('Jon Doe')
     expect(result.form.custtel).to.be.a('string').equal('+36001234567')
     expect(result.form.delivery).to.be.a('string').equal('19:15')
-  }).timeout(0)
+  }).timeout(10000)
 })

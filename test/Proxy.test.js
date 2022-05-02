@@ -1,20 +1,28 @@
 const sinon = require('sinon')
-const { describe, it } = require('mocha')
+const { describe, it, afterEach } = require('mocha')
 const Scraper = require('../src/Scraper')
 const http = require('http')
 const { expect } = require('chai')
 const config = require('../config')
 
 describe('Proxy Test', () => {
-  it('GET through proxy. Got revoked OCSP error', (done) => {
+  afterEach(() => {
+    sinon.restore()
+  })
+
+  it('GET through proxy. Get revoked OCSP error', (done) => {
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), {}))
 
-    const testProxy = testScraper.createProxy()
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
 
+    const testProxy = testScraper.createProxy()
+
     testProxy.on('error', (err) => {
       expect(err.message).to.be.equal('OCSP Status: revoked')
+
+      sinon.assert.called(testScraper.shouldCheckOcsp)
+
       testProxy.close()
       done()
     })
@@ -25,15 +33,15 @@ describe('Proxy Test', () => {
       path: '/',
       method: 'GET'
     }).end()
-  }).timeout(0)
+  })
 
-  it('GET through proxy. Successfull get data', (done) => {
+  it('GET through proxy. successfully get data', (done) => {
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), {}))
-    // sinon.stub(Agent.prototype, 'handleOCSPResponse' ).throws(new Error('file not found'))
 
-    const testProxy = testScraper.createProxy()
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
+
+    const testProxy = testScraper.createProxy()
 
     http.request({
       host: 'localhost',
@@ -49,19 +57,23 @@ describe('Proxy Test', () => {
       res.on('end', () => {
         expect(JSON.parse(data)).to.be.an('object')
         expect(JSON.parse(data).url).to.be.equal('https://www.httpbin.org/get')
+
+        sinon.assert.called(testScraper.store)
+        sinon.assert.called(testScraper.shouldCheckOcsp)
+
         testProxy.close()
         done()
       })
     }).end()
   })
 
-  it('POST through proxy. Successfull post data', (done) => {
+  it('POST through proxy. successfully post data', (done) => {
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), {}))
-    // sinon.stub(Agent.prototype, 'handleOCSPResponse' ).throws(new Error('file not found'))
 
-    const testProxy = testScraper.createProxy()
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
+
+    const testProxy = testScraper.createProxy()
 
     const req = http.request({
       host: 'localhost',
@@ -77,6 +89,10 @@ describe('Proxy Test', () => {
       res.on('end', () => {
         expect(JSON.parse(data)).to.be.an('object')
         expect(JSON.parse(data).data).to.be.equal('exampleString')
+
+        sinon.assert.called(testScraper.store)
+        sinon.assert.called(testScraper.shouldCheckOcsp)
+
         testProxy.close()
         done()
       })
