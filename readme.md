@@ -10,6 +10,7 @@ Uses an internal proxy to access requests/responses from a target host.
 - Save certificates during TLS
 - Check OCSP responses for TLS certificates
 - Interactively navigate on pages using Puppeteer
+- Target host IP filter
 
 ## Usage
 
@@ -52,6 +53,7 @@ scraper.scrape().then(() => {
 ```json
 {
   "port": 8080,
+  "ipFilter": "142.251.36.78",
   "proxy":  {
     "minVersion": "TLSv1.2",
     "ca": null,
