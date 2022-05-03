@@ -1,25 +1,15 @@
-const httpProxy = require('http-proxy')
-const fs = require('fs')
 const path = require('path')
-const Puppet = require('./Puppet')
+const fs = require('fs')
+const dns = require('dns').promises
+const { Readable } = require('stream')
+const httpProxy = require('http-proxy')
 const ocsp = require('@techteamer/ocsp')
 const proxyaddr = require('proxy-addr')
-const dns = require('dns').promises
-const tlsErrorCodes = require('./utils/CertErrors')
+const Puppet = require('./Puppet')
+const CertError = require('./utils/CertError')
 
 // Symbol to.promises store scraper specific data on request objects
 const REQ_SESS_SYMBOL = Symbol('REQ_SESS')
-class CertError extends Error {
-  constructor (errorReason, errorCode) {
-    super(`Certificate error, reason: ${errorReason}. Error Code: ${errorCode}.`)
-    this.name = this.constructor.name
-    if (errorCode) {
-      this.errorCode = errorCode
-    }
-    Error.captureStackTrace(this, this.constructor)
-  }
-}
-
 class Scraper {
   /**
    * @param {Object} scraperOptions
@@ -153,7 +143,7 @@ class Scraper {
     this.proxyStartDate = new Date()
 
     proxy.on('error', (err, req, res) => {
-      if (err.code && tlsErrorCodes.includes(err.code)) {
+      if (err.code && CertError.isCertError(err.code)) {
         this._exit(new CertError(err.message, err.code))
       } else {
         this._exit(new Error(`Error during proxy connection: ${err.message}`))
@@ -186,14 +176,7 @@ class Scraper {
       req[REQ_SESS_SYMBOL] = scraperData
 
       if (this._canSave()) {
-        const chunks = []
-        req.on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-        req.on('end', () => {
-          const body = Buffer.concat(chunks).toString()
-          this.store(body, 'request', { requestUrl, method: req.method, file: 'req.txt' })
-        })
+        this.store(req, 'request', requestUrl, proxyReq.method)
       }
     })
 
@@ -215,23 +198,16 @@ class Scraper {
       //   : ''
 
       if (this._canSave()) {
-        const chunks = []
-        proxyRes.on('data', (chunk) => {
-          chunks.push(chunk)
-        })
-        proxyRes.on('end', () => {
-          const body = Buffer.concat(chunks).toString()
-          this.store(body, 'request', { requestUrl, method: req.method, file: 'res.txt' })
-        })
+        this.store(proxyRes, 'request', requestUrl, req.method)
 
         if (ocspCheck) {
           const cert = tlsSocket.getPeerCertificate(true)
           // log cert based on verbosity
           if (cert) {
-            this.store(cert.raw, 'cert', { requestUrl, method: req.method, file: 'res.cert.txt' })
+            this.store(cert.raw, 'certificate', requestUrl, req.method)
             const issuer = cert.issuerCertificate
             if (issuer) {
-              this.store(issuer.raw, 'issuer', { requestUrl, method: req.method, file: 'res.cert.txt' })
+              this.store(issuer.raw, 'issuer', requestUrl, req.method)
             }
           }
         }
@@ -294,10 +270,14 @@ class Scraper {
     }
   }
 
+  _fsStreamHandler (savePath, stream) {
+    stream.pipe(fs.createWriteStream(savePath))
+  }
+
   /**
   * Request/Response/Cert storing
   *
-  * @param {String} data (Cert,Req/Res)
+  * @param {(ClientRequest | IncomingMessage | Object)} data Request, Response, Certificate
   * @param {String} dataType type of the data
   * @param {URL} requestUrl request from original client
   * @param {String} method request method
@@ -305,7 +285,11 @@ class Scraper {
   store (data, dataType, requestUrl, method) {
     const savePath = this._createSavePath(requestUrl, method, dataType)
     fs.mkdirSync(path.dirname(savePath), { recursive: true })
-    fs.writeFileSync(savePath, data)
+    if (data instanceof Readable && typeof data.pipe === 'function') {
+      this._fsStreamHandler(savePath, data)
+    } else {
+      fs.writeFileSync(savePath, data)
+    }
   }
 }
 

@@ -14,7 +14,7 @@ describe('Proxy Test', () => {
 
   it('GET through proxy. Get revoked OCSP error', (done) => {
     const testPort = randomPort()
-    const testScraper = new Scraper(Object.assign(config.clone('scrapers.ocspTest'), { port: testPort }))
+    const testScraper = new Scraper(Object.assign(config.clone('scrapers.OCSPFail'), { port: testPort }))
 
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()

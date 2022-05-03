@@ -1,34 +1,27 @@
 {
-  "name": "nyilvantarto_scrapi",
+  "name": "scraper",
   "version": "1.0.0",
   "main": "scrape.js",
   "license": "proprietary",
   "private": true,
   "scripts": {
-    "lint": "eslint .",
-    "test": "mocha --exit"
+    "lint": "standard .",
+    "test": "NODE_ENV=test mocha --exit"
   },
   "engines": {
     "node": ">=12"
   },
   "devDependencies": {
     "chai": "^4.3.6",
-    "eslint": "^8.9.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "getconfig": "^4.5.0",
     "mocha": "^9.2.2",
-    "sinon": "^13.0.2"
+    "sinon": "^13.0.2",
+    "standard": "^17.0.0"
   },
   "dependencies": {
     "@techteamer/ocsp": "^1.0.0",
-    "cookie": "^0.4.2",
-    "getconfig": "^4.5.0",
     "http-proxy": "^1.18.1",
-    "inquirer": "^8.2.0",
     "proxy-addr": "^2.0.7",
-    "puppeteer": "^13.3.2",
-    "type-is": "^1.6.18"
+    "puppeteer": "^13.3.2"
   }
 }
