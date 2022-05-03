@@ -8,7 +8,7 @@ class CertError extends Error {
     Error.captureStackTrace(this, this.constructor)
   }
 
-  isCertError (errorCode) {
+  static isCertError (errorCode) {
     return this.certErrorCodes.includes(errorCode)
   }
 
