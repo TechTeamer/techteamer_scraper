@@ -1,8 +1,8 @@
 const sinon = require('sinon')
-const { describe, it, afterEach } = require('mocha')
-const Scraper = require('../src/Scraper')
-const http = require('http')
 const { expect } = require('chai')
+const { describe, it, afterEach } = require('mocha')
+const http = require('http')
+const Scraper = require('../src/Scraper')
 const config = require('../config')
 
 const randomPort = () => Math.floor(Math.random() * (9000 - 8000 + 1) + 8000)
@@ -22,7 +22,7 @@ describe('Proxy Test', () => {
     const testProxy = testScraper.createProxy()
 
     testProxy.on('error', (err) => {
-      expect(err.message).to.be.equal('OCSP Status: revoked')
+      expect(err).to.be.instanceof(Error)
 
       sinon.assert.called(testScraper.shouldCheckOcsp)
 
