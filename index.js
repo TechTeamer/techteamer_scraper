@@ -1,1 +1,3 @@
-module.exports = require('./src/Scraper')
+const Scraper = require('./src/Scraper')
+
+module.exports = Scraper
