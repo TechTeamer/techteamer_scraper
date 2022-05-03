@@ -143,7 +143,7 @@ class Scraper {
     this.proxyStartDate = new Date()
 
     proxy.on('error', (err, req, res) => {
-      if (err.code && CertError.isCertError(err.code)) {
+      if (err.code && CertError.errorCodes.includes(err.code)) {
         this._exit(new CertError(err.message, err.code))
       } else {
         this._exit(new Error(`Error during proxy connection: ${err.message}`))

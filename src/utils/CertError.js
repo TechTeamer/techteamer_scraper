@@ -8,11 +8,7 @@ class CertError extends Error {
     Error.captureStackTrace(this, this.constructor)
   }
 
-  static isCertError (errorCode) {
-    return this.certErrorCodes.includes(errorCode)
-  }
-
-  static certErrorCodes = [
+  static errorCodes = [
     'UNABLE_TO_GET_ISSUER_CERT',
     'UNABLE_TO_GET_CRL',
     'UNABLE_TO_DECRYPT_CERT_SIGNATURE',
