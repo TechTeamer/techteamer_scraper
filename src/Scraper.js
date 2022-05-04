@@ -277,7 +277,7 @@ class Scraper {
   /**
   * Request/Response/Cert storing
   *
-  * @param {(ClientRequest | IncomingMessage | Object)} data Request, Response, Certificate
+  * @param {(ClientRequest | IncomingMessage | Buffer | String)} data Request, Response, Certificate
   * @param {String} dataType type of the data
   * @param {URL} requestUrl request from original client
   * @param {String} method request method

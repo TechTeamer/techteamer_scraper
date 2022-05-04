@@ -1,11 +1,11 @@
 {
   "name": "scraper",
   "version": "1.0.0",
-  "main": "scrape.js",
+  "main": "index.js",
   "license": "proprietary",
   "private": true,
   "scripts": {
-    "lint": "standard .",
+    "lint": "eslint .",
     "test": "NODE_ENV=test mocha --exit"
   },
   "engines": {
@@ -13,10 +13,15 @@
   },
   "devDependencies": {
     "chai": "^4.3.6",
+    "eslint": "^8.14.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-standard": "^5.0.0",
     "getconfig": "^4.5.0",
     "mocha": "^9.2.2",
-    "sinon": "^13.0.2",
-    "standard": "^17.0.0"
+    "sinon": "^13.0.2"
   },
   "dependencies": {
     "@techteamer/ocsp": "^1.0.0",
