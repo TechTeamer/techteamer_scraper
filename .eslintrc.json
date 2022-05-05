@@ -1,21 +1,13 @@
 {
-  "root": true,
-  "extends": ["standard", "plugin:node/recommended"],
+  "extends": "standard",
   "rules": {
-    "curly": ["error", "all"],
-    "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
+    "curly": "error",
     "guard-for-in": "error",
     "no-console": "error",
-    "no-debugger": "error",
-    "radix": "error",
-    "node/no-deprecated-api": "warn",
-    "node/no-process-exit": "off",
-    "no-process-exit": "off",
-    "node/shebang": "off",
-    "no-empty-function": "error",
-    "no-shadow": "warn"
+    "no-debugger": "error"
   },
   "env": {
+    "node": true,
     "commonjs": true,
     "es6": true
   }

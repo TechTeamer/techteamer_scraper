@@ -1,0 +1,54 @@
+{
+  "defaults": {
+    "port": 8080,
+    "ocsp": {
+      "agent": {}
+    },
+    "ipFilter": null,
+    "browser":  {
+      "autoClose": false,
+      "puppeteer": {
+        "headless": true
+      }
+    },
+    "save": {
+      "rootDir": "captures/"
+    },
+    "loggerOptions": {
+      "verbosity": {
+        "headers": false
+      }
+    }
+  },
+  "scrapers": {
+    "test": {
+      "port": "${self.defaults.port}",
+      "loggerOptions": "${self.defaults.loggerOptions}",
+      "proxy":  {
+        "minVersion": "TLSv1.3",
+        "target": {
+          "protocol": "https:",
+          "host": "www.httpbin.org",
+          "port": 443
+        }
+      },
+      "ocsp": "${self.defaults.ocsp}",
+      "browser": "${self.defaults.browser}",
+      "save": "${self.defaults.save}"
+    },
+    "OCSPFail": {
+      "port": "${self.defaults.port}",
+      "loggerOptions": "${self.defaults.loggerOptions}",
+      "proxy":  {
+        "target": {
+          "protocol": "https:",
+          "host": "revoked.badssl.com",
+          "port": 443
+        }
+      },
+      "ocsp": "${self.defaults.ocsp}",
+      "browser": "${self.defaults.browser}",
+      "save": "${self.defaults.save}"
+    }
+  }
+}

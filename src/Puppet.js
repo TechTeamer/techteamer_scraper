@@ -36,11 +36,9 @@ class Puppet {
         // handle force close events form the outside during a connection attempt
         // NOTE: sometimes it's okay to receive an error here if the browser was abruptly closed
         // e.g. if TLS was rejected it causes "Protocol error (Page.navigate): Target closed."
-        this.logger.warn('Browser already closed:', err.message)
         return
       }
 
-      this.logger.error('Error doing scraping stuff', err)
       throw new Error('Error doing scraping stuff')
     }
 
@@ -68,53 +66,26 @@ class Puppet {
   }
 
   async logResponse (response) {
-    const request = response.request()
-    const method = request.method()
-    const headers = response.headers()
-    const url = response.url()
-    const status = response.status()
-    const statusText = response.statusText()
-    const remoteAddress = response.remoteAddress()
-    // console.debug('PUPPETEER response:response', remoteAddress.ip, remoteAddress.port, method, url, status, statusText, JSON.stringify(headers, null, 0))
-
-    const securityDetails = response.securityDetails()
-    if (securityDetails) {
-      const issuer = securityDetails.issuer()
-      const subjectName = securityDetails.subjectName()
-      const validFrom = securityDetails.validFrom()
-      const validTo = securityDetails.validTo()
-      const protocol = securityDetails.protocol()
-      const subjectAlternativeNames = securityDetails.subjectAlternativeNames()
-      console.debug('PUPPETEER response:issuer', issuer)
-      console.debug('PUPPETEER response:subjectName', subjectName)
-      console.debug('PUPPETEER response:valid', validFrom, validTo)
-      console.debug('PUPPETEER response:protocol', protocol)
-      console.debug('PUPPETEER response:altNames', subjectAlternativeNames)
-    }
-
-    // if (status >= 200 && status < 300) {
-    //   const html = await response.text()
-    //   console.debug('PUPPETEER response:body', html.slice(0, 100))
+    // const securityDetails = response.securityDetails()
+    // if (securityDetails) {
+    //   const issuer = securityDetails.issuer()
+    //   const subjectName = securityDetails.subjectName()
+    //   const validFrom = securityDetails.validFrom()
+    //   const validTo = securityDetails.validTo()
+    //   const protocol = securityDetails.protocol()
+    //   const subjectAlternativeNames = securityDetails.subjectAlternativeNames()
+    //   console.debug('PUPPETEER response:issuer', issuer)
+    //   console.debug('PUPPETEER response:subjectName', subjectName)
+    //   console.debug('PUPPETEER response:valid', validFrom, validTo)
+    //   console.debug('PUPPETEER response:protocol', protocol)
+    //   console.debug('PUPPETEER response:altNames', subjectAlternativeNames)
     // }
   }
 
   async setupPage (browser, url) {
-    // console.debug('PUPPETEER page:new', url)
     const page = await browser.newPage()
-    // await page.setRequestInterception(true)
-
-    page.on('request', async (request) => {
-      console.debug('PUPPETEER REQUEST', request.url())
-
-      // if (request.isInterceptResolutionHandled()) {
-      //   return
-      // }
-
-      // return request.continue()
-    })
 
     page.on('response', async (response) => {
-      console.debug('PUPPETEER RESPONSE', response.url())
       const request = response.request()
 
       if (request.resourceType() !== 'document') {
@@ -124,22 +95,15 @@ class Puppet {
       await this.logResponse(response)
     })
 
-    page.on('requestfinished', async (request) => {
-      // console.debug('PUPPETEER requestfinished', request.method(), request.url())
-    })
-
     if (url) {
       const uri = `${this.host}${url}`
-      console.debug('PUPPETEER opening url', uri)
       await page.goto(uri)
 
       try {
         await page.waitForNetworkIdle({
           timeout: 3000
         })
-        console.debug('PUPPETEER navigated to', uri)
       } catch (err) {
-        console.error('Error opening page', uri, err)
         throw new Error('Error opening page')
       }
     }
@@ -155,7 +119,6 @@ class Puppet {
 
     const formElement = await page.$(form)
 
-    // console.debug('PUPPETEER form', form)
     for (const [name, value] of Object.entries(fields)) {
       await formElement.waitForSelector(name)
 
@@ -168,16 +131,13 @@ class Puppet {
 
       if (Array.isArray(realValue)) {
         await input.select(...realValue)
-        // console.debug('PUPPETEER select', name, ...realValue)
       } else {
         await input.click()
         await input.type(realValue, { delay: 100 })
-        // console.debug('PUPPETEER input', name, realValue)
       }
     }
 
     const button = await formElement.$(submit)
-    console.debug('PUPPETEER submit', submit, JSON.stringify(fields, null, 0))
 
     const [submitResponse] = await Promise.all([
       page.waitForNavigation({

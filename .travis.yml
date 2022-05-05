@@ -1,0 +1,13 @@
+os: linux
+dist: focal
+
+language: node_js
+
+node_js:
+  - 16
+  - 14
+  
+script:
+  - npm run lint
+  - npm test
+  
