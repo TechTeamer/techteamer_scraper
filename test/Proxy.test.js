@@ -17,14 +17,6 @@ describe('Proxy Test', () => {
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.OCSPFail'), { port: testPort }))
     sinon.stub(testScraper, 'shouldCheckOcsp').returns(true)
     sinon.stub(testScraper, 'store').resolves()
-    // const testProxy = testScraper.createProxy()
-    // testProxy.on('error', (err) => {
-    //  // expect(err).to.be.instanceof(Error)
-    //   // sinon.assert.called(testScraper.shouldCheckOcsp)
-    //   done()
-    //   testProxy.close()
-    //   throw new Error(err.message)
-    // })
     testScraper.scraper = async function (puppet, browser) {
       await puppet.setupPage(browser, '/')
     }
@@ -35,12 +27,6 @@ describe('Proxy Test', () => {
       expect(error).to.be.instanceof(Error)
       sinon.assert.called(testScraper.shouldCheckOcsp)
     }
-    // const req = http.request({
-    //   host: 'localhost',
-    //   port: testPort,
-    //   path: '/',
-    //   method: 'GET'
-    // }).end()
   })
 
   it('GET through proxy. successfully get data', (done) => {
