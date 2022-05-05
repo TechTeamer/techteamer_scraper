@@ -1,9 +1,13 @@
 {
-  "name": "scraper",
+  "name": "@techteamer/scraper",
+  "description": "Interactively scrape websites and save communication data",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "proprietary",
-  "private": true,
+  "license": "MIT",
+  "contributors": [
+    "Zoltán Nagy <zoltan.nagy@facekom.com>",
+    "Mihály Pintér <mihaly.pinter@facekom.com>"
+  ],
   "scripts": {
     "lint": "eslint .",
     "test": "NODE_ENV=test mocha --exit --timeout 15000"
