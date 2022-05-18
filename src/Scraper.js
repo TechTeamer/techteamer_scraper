@@ -198,7 +198,7 @@ class Scraper {
       //   : ''
 
       if (this._canSave()) {
-        this.store(proxyRes, 'request', requestUrl, req.method)
+        this.store(proxyRes, 'response', requestUrl, req.method)
 
         if (ocspCheck) {
           const cert = tlsSocket.getPeerCertificate(true)
@@ -252,6 +252,7 @@ class Scraper {
   async _targetAddressIPFilter (ipFilter, targetHost) {
     try {
       const hostIp = await dns.lookup(targetHost)
+      this.store(hostIp.address, 'targetHost', { pathname: '/', hostname: targetHost }, 'dnsLookup')
       if (!proxyaddr.compile(ipFilter)(hostIp.address)) {
         throw new Error('Untrusted target IP: ' + hostIp.address)
       }
