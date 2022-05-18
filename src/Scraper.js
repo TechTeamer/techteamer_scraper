@@ -152,12 +152,6 @@ class Scraper {
 
     proxy.on('proxyReq', (proxyReq, req, res, options) => {
       const requestUrl = new URL(`${proxyReq.protocol}${proxyReq.host}${proxyReq.path}`)
-      // const method = proxyReq.method
-      // const href = requestUrl.href
-      // const logHeaders = this.options.loggerOptions.verbosity.logHeaders
-      // const rawHeaders = logHeaders
-      //   ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
-      //   : ''
 
       proxyReq.setHeader('referer', requestUrl.origin)
 
@@ -169,11 +163,10 @@ class Scraper {
         }
       }
 
-      const scraperData = {
+      req[REQ_SESS_SYMBOL] = {
         requestUrl,
         ocspCheck: !!options.agent
       }
-      req[REQ_SESS_SYMBOL] = scraperData
 
       if (this._canSave()) {
         this.store(req, 'request', requestUrl, proxyReq.method)
@@ -186,16 +179,6 @@ class Scraper {
         ocspCheck
       } = req[REQ_SESS_SYMBOL]
       const tlsSocket = proxyRes.socket.ssl || proxyRes.socket
-      // const protocolVersion = tlsSocket.getProtocol()
-      // const method = req.method
-      // const href = requestUrl.href
-      // const statusCode = proxyRes.statusCode
-      // const statusMessage = proxyRes.statusMessage
-      // const ip = proxyRes.socket.remoteAddress
-      // const logHeaders = this.options.loggerOptions.verbosity.logHeaders
-      // const rawHeaders = logHeaders
-      //   ? '\n' + this._formatRawHeaders(req.rawHeaders, '  ')
-      //   : ''
 
       if (this._canSave()) {
         this.store(proxyRes, 'response', requestUrl, req.method)
