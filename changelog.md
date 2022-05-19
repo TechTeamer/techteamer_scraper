@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+# 1.0.2
+
+- pass input param to scraper
+
 # 1.0.1
 
 - add dnslookup info to saved contents
