@@ -40,7 +40,7 @@ class Scraper {
     this.ocspAgent = null
   }
 
-  async scrape () {
+  async scrape (input) {
     this._resultPromise = new Promise((resolve, reject) => {
       this._resolve = resolve
       this._reject = reject
@@ -60,7 +60,7 @@ class Scraper {
     let results
     try {
       results = await this.puppet.browse((puppet, browser) => {
-        return this.scraper(puppet, browser)
+        return this.scraper(puppet, browser, input)
       })
     } catch (err) {
       if (!this.puppet && !this.proxy) {
@@ -222,7 +222,7 @@ class Scraper {
    * @param {Puppet} puppet
    * @param {Browser} browser
    */
-  async scraper (puppet, browser) {
+  async scraper (puppet, browser, input) {
     if (typeof this.options.scraper === 'function') {
       return this.options.scraper(puppet, browser)
     }
