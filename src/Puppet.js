@@ -104,7 +104,8 @@ class Puppet {
           timeout: 60000
         })
       } catch (err) {
-        throw new Error(`Error opening page: ${err.message} (${uri})`)
+        this.logger.error('Error opening page', err)
+        throw new Error('Error opening page')
       }
     }
 
