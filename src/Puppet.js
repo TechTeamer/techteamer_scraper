@@ -101,9 +101,10 @@ class Puppet {
 
       try {
         await page.waitForNetworkIdle({
-          timeout: 3000
+          timeout: 60000
         })
       } catch (err) {
+        this.logger.error('Error opening page', err)
         throw new Error('Error opening page')
       }
     }

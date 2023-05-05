@@ -55,7 +55,9 @@ class Scraper {
     }
 
     this.proxy = this.createProxy()
-    this.puppet = new Puppet(this.proxyHost, this.options.browser)
+    const puppetOptions = this.options.browser
+    puppetOptions.logger = this.logger
+    this.puppet = new Puppet(this.proxyHost, puppetOptions)
 
     let results
     try {
