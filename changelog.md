@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+# 1.0.3
+
+- http request timeout for setupPage
+- pass logger to puppet
+
 # 1.0.2
 
 - pass input param to scraper
