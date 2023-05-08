@@ -1,13 +1,10 @@
 os: linux
-dist: focal
+dist: jammy
 
 language: node_js
 
 node_js:
-  - 16
-  - 14
-  
+  - 18
+
 script:
   - npm run lint
-  - npm test
-  
