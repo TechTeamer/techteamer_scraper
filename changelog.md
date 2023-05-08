@@ -1,5 +1,8 @@
 CHANGELOG
 =========
+# 1.0.4
+
+- dependency update
 
 # 1.0.3
 
