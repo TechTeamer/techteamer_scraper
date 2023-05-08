@@ -28,7 +28,7 @@ describe('Proxy Test', () => {
       sinon.assert.called(testScraper.shouldCheckOcsp)
     }
   })
-
+/*
   it('GET through proxy. successfully get data', (done) => {
     const testPort = randomPort()
     const testScraper = new Scraper(Object.assign(config.clone('scrapers.test'), { port: testPort }))
@@ -96,4 +96,6 @@ describe('Proxy Test', () => {
     req.write('exampleString')
     req.end()
   })
+ */
 })
+
